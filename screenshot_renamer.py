@@ -1,9 +1,15 @@
 # from time import strftime, strptime
 import time
 import os
+# import webbrowser
 
 # define variables
-picsdir = '/Users/james/Pictures'
+#picsdir = '/Users/james/Pictures'
+picsdir = os.environ.get('PICSDIR')
+user_choice = ''
+my_png_files = []
+today_files = []
+all_ss =  os.listdir(picsdir)
 
 helptext = "\n 'h' - help."
 helptext += "\n 's' - skip"
@@ -29,14 +35,65 @@ def new_namer(base_file_path,before_file_name,ss_date,ticket_num,ss_desc):
     my_after_file = base_file_path + '/' + my_ticket_num  + ss_date + '_' +  ss_desc + file_ext
     return my_after_file
 
-def renamer(before_file_name, after_file_name):
-    my_before_file = base_file_path + '/' + before_file_name
-    os.rename(before_file_name,after_file_name)
+def renamer(base_file_path,before_file_name,after_file_name):
+    my_before_file = os.path.join(base_file_path,before_file_name)
+    os.rename(my_before_file,after_file_name)
 
-# get user input
-my_input = input('Enter a date in the format YYYYMMDD: ')
+def rename_ui(files_to_rename,base_file_path,my_ticket_num,ss_date):
+ for current_file in files_to_rename:
+    print("Current file is: {}".format(current_file))
+#    open_file(picsdir,current_file)
+    print("Enter d to set a description or s to skip...")
+    get_user_input()
+    if user_choice == 's':
+        continue
+    elif user_choice == 'd':
+       ss_desc = input('Enter a description for the screenshot: ')
+       file_ext = current_file[-4:]
+       my_after_file = new_namer(base_file_path,current_file,ss_date,my_ticket_num,ss_desc)
+       print("Rename to {}?".format(my_after_file))
+       print("Enter f to confirm or c to cancel")
+       get_user_input()
+       if user_choice == 'c':
+         continue
+       elif user_choice == 'f':
+         renamer(picsdir,current_file,my_after_file)
+
+# main body         
+
+def get_user_input():
+    global user_choice
+    user_choice = input('Enter an option or h for help: ')
+    return user_choice
+
+# get initial input
+def initialize_values():
+    ss_date  = input('Enter a date in the format YYYYMMDD: ')
+    my_ticket_num = input('Enter a JIRA ticket number: ')
+
+
+initialize_values()
+
+   
+for my_file in all_ss:
+    current_stamp = convert_time(picsdir, my_file)
+    if current_stamp == ss_date and my_file[-4:] == '.png':
+      today_files.append(my_file)
+
+rename_ui(today_files,picsdir,my_ticket_num,my_input)
+
+
+### Add to notes and then delete
+# no
+#def open_file(base_file_path,current_file):
+#  webbrowser.open(os.path.join(base_file_path, current_file))
+# does not work on the work mac
+#def open_file(base_file_path,current_file):
+#  webbrowser.open(base_file_path + '/' + current_file)
+
 
 # make a list of png files in the base directory
-my_png_files += [my_file for my_file in os.listdir(picsdir) if my_file[-4:] == '.png']
+# my_png_files += [my_file for my_file in os.listdir(picsdir) if my_file[-4:] == '.png']
 
-    
+
+
