@@ -5,6 +5,7 @@ from time import strftime, strptime
 import time
 import os
 import webbrowser
+# import readline
 
 # define variables
 picsdir = '/Users/james/Pictures'
@@ -19,12 +20,11 @@ helptext = "\n 'h' - help."
 helptext += "\n 's' - skip"
 helptext += "\n 'c' - cancel rename"
 helptext += "\n 'f' - confirm rename"
-helptext += "\n 'a' - change file date"
 helptext += "\n 'g' - change incident date"
 helptext += "\n 'r' - reinitialize"
-helptext += "\n 't' = change ticket number"
-helptext += "\n 'd' = change defaults"
-helptext += "\n 'q' = quit"
+helptext += "\n 't' - change ticket number"
+helptext += "\n 'd' - change defaults"
+helptext += "\n 'q' - quit"
 
 # define functions
 def convert_time(base_file_path, file_name):
@@ -52,7 +52,7 @@ def rename_ui(files_to_rename,base_file_path,my_ticket_num,ss_date):
     open_file(picsdir,current_file)
     webbrowser.open('file://' + (os.path.join(picsdir,current_file)))
     print("Enter d to set a description or s to skip...")
-    get_user_input()
+    user_choice = get_user_input()
     if user_choice == 's':
         continue
     elif user_choice == 'd':
@@ -61,7 +61,7 @@ def rename_ui(files_to_rename,base_file_path,my_ticket_num,ss_date):
        my_after_file = new_namer(base_file_path,current_file,ss_date,my_ticket_num,ss_desc)
        print("Rename to {}?".format(my_after_file))
        print("Enter f to confirm or c to cancel")
-       get_user_input()
+       user_choice = get_user_input()
        if user_choice == 'c':
          continue
        elif user_choice == 'f':
@@ -70,19 +70,18 @@ def rename_ui(files_to_rename,base_file_path,my_ticket_num,ss_date):
 # main body         
 
 def get_user_input():
-    global user_choice
     user_choice = input('Enter an option or h for help: ')
     return user_choice
 
 # get initial input
 def initialize_values():
-    global ss_date
-    global my_ticket_num
     ss_date  = input('Enter a date in the format YYYYMMDD: ')
     my_ticket_num = input('Enter a JIRA ticket number: ')
     return ss_date, my_ticket_num
 
-initialize_values()
+user_values = initialize_values()
+ss_date = user_values[0]
+my_ticket_num = user_values[1]
    
 for my_file in all_ss:
     current_stamp = convert_time(picsdir, my_file)
@@ -90,6 +89,4 @@ for my_file in all_ss:
       today_files.append(my_file)
 
 rename_ui(today_files,picsdir,my_ticket_num,ss_date)
-
-
 
