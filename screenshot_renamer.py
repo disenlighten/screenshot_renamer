@@ -6,18 +6,26 @@ import time
 import os
 import webbrowser
 import sys
+import argparse
 # for a future feature
 # import readline
 
 # define variables
 picsdir = '/Users/james/Pictures'
+default_date = time.strftime("%Y%m%d")
 # not working?
 # picsdir = os.environ.get('PICSDIR')
 user_choice = ''
 my_png_files = []
 today_files = []
 all_ss = os.listdir(picsdir)
-file_to_modify = sys.argv[1]
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-f", dest="file_to_modify", help="A picture that you want to rename")
+parser.add_argument("-d", dest="ss_date", default=default_date, help="Date in the format YYYYMMDD")
+parser.add_argument("-t", dest="my_ticket_num", help="Ticket number")
+
+args = parser.parse_args()
 
 helptext = "\n 'h' - help."
 helptext += "\n 's' - skip"
@@ -114,11 +122,14 @@ def initialize_values():
 # main body  
 
 # handle command line use if there a file is called from the command line
-if file_to_modify:
+if args.file_to_modify is not None:
+    file_to_modify = args.file_to_modify
     dir_path = os.path.dirname(os.path.realpath(file_to_modify))
-    user_values = initialize_values()
-    ss_date = user_values[0]
-    my_ticket_num = user_values[1]
+    ss_date = args.ss_date
+    if args.my_ticket_num is not None:
+        my_ticket_num = args.my_ticket_num
+    else:
+        my_ticket_num = ""
     rename_ui_onefile(dir_path,file_to_modify,ss_date,my_ticket_num)
 else:
     user_values = initialize_values()
